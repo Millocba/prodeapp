@@ -16,11 +16,9 @@ public class Pronostico {
     public int puntos() {
       int puntos = 0;
       
-      if (equipo == partido.getEquipo1() && partido.getGolesEquipo1() == partido.getGolesEquipo2()) {
-        puntos += 1;
-      } else if (equipo == partido.getEquipo2() && partido.getGolesEquipo2() == partido.getGolesEquipo1()) {
-        puntos += 1;
-      }
+      if (partido.getResultado() == resultado){
+        puntos++;
+    }
       
       return puntos;
     }
