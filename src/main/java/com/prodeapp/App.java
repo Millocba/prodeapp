@@ -19,7 +19,7 @@ public class App {
         int[] golSele2 = new int[2];
 
             ResultadoEnum resultado;
-            //ResultadoEnum resultado2;
+            
             int j =0;
             List<String> lineas1 = FileReaderUtil.readLines("Recursos/resultados.csv");
             for (String linea1 : lineas1) {
@@ -29,7 +29,7 @@ public class App {
                         j++;
                         continue;
                     }
-
+                    //separo los datos y cargo las variables locales de resultados
                     String[] values = linea1.split(";");
                     sele1[j-1] = values[0];
                     sele2[j-1] = values[5];
@@ -39,8 +39,9 @@ public class App {
                     j++;
                     }
 
-
+            
             int puntosAcum= 0;
+            //inicio el recorrido de los partidos
             for (String line : lineas) {
 
                 if (lineCount == 0) {
@@ -49,6 +50,7 @@ public class App {
                     continue;
                 }
 
+                //separar campos y asignar valores a las variables pronostico
                 String[] values = line.split(";");
                 String[] selecciones = {"Argentina","Arabia Saudita", "Polonia", "México"};
 
@@ -59,10 +61,12 @@ public class App {
                 String descripcion2 = selecciones[Integer.parseInt(nombre2)-1];
 
                 //System.out.println(nombre1 + descripcion1+"\n"+ nombre2 + descripcion2);
-
+                
+                //generar los obejos equipos
                 Equipo equipo1 = new Equipo(nombre1,descripcion1);
                 Equipo equipo2 = new Equipo(nombre2,descripcion2);
-        
+                
+                //armar los partidos
                 partidos[i] = new Partido(equipo1, equipo2, golSele1[i], golSele2[i]);
                                
                 if (values[1].equals("X")){
@@ -78,10 +82,8 @@ public class App {
                 Pronostico pronostico1 = new Pronostico(partidos[i], equipo1, resultado);
                 //Pronostico pronostico2 = new Pronostico(partidos[i], equipo2, resultado2);
 
-                System.out.println(resultado);
-                /* if (partidos[i].getResultado() == pronostico1.getResultado()){
-                    puntosAcum++;
-                } */
+                //System.out.println(resultado);
+                
                 puntosAcum += pronostico1.puntos();
 
                 System.out.println("Resultado del partido " + i + "-> " + descripcion1 + "-> " + partidos[i].getResultado());
