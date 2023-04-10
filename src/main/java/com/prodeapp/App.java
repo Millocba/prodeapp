@@ -34,7 +34,7 @@ public class App {
                             matcher = pattern.matcher(values[5]);
 
                             if(values[5].isEmpty() || matcher.matches()){
-                                if(values[2]=="X"||values[3]=="X"||values[4]=="X"){
+                                if(values[2].equals("X")||values[3].equals("X")||values[4].equals("X")){
                                     continue;
                                 }else{
                                     System.out.println("Falta el pronostico ");
@@ -60,7 +60,6 @@ public class App {
             }
         }
 
-
         //solicita obtener los participantes
         ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas);
 
@@ -79,4 +78,3 @@ public class App {
 
     }
 }
-
