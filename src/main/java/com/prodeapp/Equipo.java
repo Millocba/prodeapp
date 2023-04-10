@@ -3,13 +3,11 @@ package com.prodeapp;
 public class Equipo {
     private String nombre;
     private String descripcion;
-    private ArrayList<Partido> partidosJugados;
     
     // Constructor
     public Equipo(String nombre, String descripcion) {
       this.nombre = nombre;
       this.descripcion = descripcion;
-      this.partidosJugados = new ArrayList<Partido>();
     }
     
     // Getters y Setters
@@ -29,12 +27,5 @@ public class Equipo {
       this.descripcion = descripcion;
     }
 
-    public ArrayList<Partido> getPartidosJugados() {
-      return partidosJugados;
-    }
-
-    public void setPartidosJugados(ArrayList<Partido> partidosJugados) {
-      this.partidosJugados = partidosJugados;
-    }
   }
   
