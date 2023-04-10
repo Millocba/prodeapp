@@ -1,101 +1,82 @@
 package com.prodeapp;
 
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class App {
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) throws IOException {
 
-        // Leer archivo de pronósticos
-        List<String> lineas = FileReaderUtil.readLines("Recursos/pronostico.csv");
-        Partido[] partidos = new Partido[2];
+        //solicita leer el archivo pronostico
+        List<String> lineas = FileReaderUtil.readLines("Recursos/Pronostico2.csv");
+        
+        //crear un metodo aparte
         int i = 0;
-        int lineCount = 0;
-        String[] sele1 = new String[2];
-        String[] sele2 = new String[2];
-        int[] golSele1 = new int[2];
-        int[] golSele2 = new int[2];
-
-            ResultadoEnum resultado;
-            //ResultadoEnum resultado2;
-            int j =0;
-            List<String> lineas1 = FileReaderUtil.readLines("Recursos/resultados.csv");
-            for (String linea1 : lineas1) {
-                   
-                    if (j == 0) {
-                        // saltar la primera línea
-                        j++;
-                        continue;
-                    }
-
-                    String[] values = linea1.split(";");
-                    sele1[j-1] = values[0];
-                    sele2[j-1] = values[5];
-                    golSele1[j-1] = Integer.parseInt(values[3]);
-                    golSele2[j-1] = Integer.parseInt(values[4]);
-                    
-                    j++;
-                    }
-
-
-            int puntosAcum= 0;
-            for (String line : lineas) {
-
-                if (lineCount == 0) {
-                    // saltar la primera línea
-                    lineCount++;
-                    continue;
-                }
-
-                String[] values = line.split(";");
-                String[] selecciones = {"Argentina","Arabia Saudita", "Polonia", "México"};
-
-                String nombre1 = values[0].trim();
-                String descripcion1 = selecciones[Integer.parseInt(nombre1)-1];
-
-                String nombre2 = values[4].trim();
-                String descripcion2 = selecciones[Integer.parseInt(nombre2)-1];
-
-                //System.out.println(nombre1 + descripcion1+"\n"+ nombre2 + descripcion2);
-
-                Equipo equipo1 = new Equipo(nombre1,descripcion1);
-                Equipo equipo2 = new Equipo(nombre2,descripcion2);
-        
-                partidos[i] = new Partido(equipo1, equipo2, golSele1[i], golSele2[i]);
-                               
-                if (values[1].equals("X")){
-                    resultado = ResultadoEnum.GANADOR;
-                    //resultado2 = ResultadoEnum.PERDEDOR;
-                }else if(values[2].equals("X")){
-                    resultado = ResultadoEnum.EMPATE;
-                    //resultado2 = ResultadoEnum.EMPATE;
-                }else{
-                    resultado = ResultadoEnum.PERDEDOR;
-                    //resultado2 = ResultadoEnum.GANADOR;
-                }
-                Pronostico pronostico1 = new Pronostico(partidos[i], equipo1, resultado);
-                //Pronostico pronostico2 = new Pronostico(partidos[i], equipo2, resultado2);
-
-                System.out.println(resultado);
-                /* if (partidos[i].getResultado() == pronostico1.getResultado()){
-                    puntosAcum++;
-                } */
-                puntosAcum += pronostico1.puntos();
-
-                System.out.println("Resultado del partido " + i + "-> " + descripcion1 + "-> " + partidos[i].getResultado());
-                System.out.println("pronostico: " + pronostico1.getResultado());
-                System.out.println("Sumas "+ puntosAcum + " puntos");
-                //System.out.println("pronostico: " + pronostico2.getResultado());
-
+        for(String linea : lineas){
+            if(i==0){
                 i++;
+                continue;
+            }else{
+                String[] values = linea.split(";");
+                if (values.length==6){
+                    if (!values[0].isEmpty()){
+                        
+                        String regex = "(^[1-9]\\d*$)";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(values[1]);
+                        
+                        if(values[1].isEmpty() || matcher.matches()){
+                            
+                            matcher = pattern.matcher(values[5]);
 
+                            if(values[5].isEmpty() || matcher.matches()){
+                                if(values[2]=="X"||values[3]=="X"||values[4]=="X"){
+                                    continue;
+                                }else{
+                                    System.out.println("Falta el pronostico ");
+                                    System.exit(1);
+                                }
+                                
+                            }else{
+                                System.out.println("Falta el equipo 2 ");
+                                System.exit(1);
+                            }
+
+                        }else{
+                            System.out.println("Falta el equipo 1 ");
+                            System.exit(1);
+                        }
+
+
+                    }else{
+                        System.out.println("Falta el nombre del participante");
+                        System.exit(1);
+                    }
+                }
             }
+        }
 
-        System.out.println("Total de puntos acumulados: "+ puntosAcum);
-    
+
+        //solicita obtener los participantes
+        ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas);
+
+        Collections.sort(participantes, new Comparator<Participante>() {
+            @Override
+            public int compare(Participante p1, Participante p2) {
+                return Integer.compare(p2.getPuntajeTotal(), p1.getPuntajeTotal());
+            }
+        });
         
+        // Imprimir los participantes ordenados
+        for (Participante p : participantes) {
+            System.out.println("El participante " + p.getNombre() + " obtuvo " + p.getPuntajeTotal() + " puntos y bonus de " + p.getBonus());
+        }
+
+
     }
 }
 

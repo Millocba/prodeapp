@@ -6,14 +6,16 @@ public class Partido {
     private int golesEquipo1;
     private int golesEquipo2;
     private ResultadoEnum resultado;
-    
+    private Ronda ronda;
+
     // Constructor
-    public Partido(Equipo equipo1, Equipo equipo2, int golesEquipo1, int golesEquipo2) {
+    public Partido(Equipo equipo1, Equipo equipo2, int golesEquipo1, int golesEquipo2, Ronda ronda) {
       this.equipo1 = equipo1;
       this.equipo2 = equipo2;
       this.golesEquipo1 = golesEquipo1;
       this.golesEquipo2 = golesEquipo2;
       this.resultado = calcularResultado();
+      this.ronda = ronda;
     }
     
     // Método privado para calcular el resultado del partido
@@ -67,5 +69,34 @@ public class Partido {
     public void setResultado(ResultadoEnum resultado) {
       this.resultado = resultado;
     }
+
+    public Ronda getRonda() {
+      return ronda;
+    }
+
+    public int getRondaNro() {
+      return Integer.parseInt(ronda.getNro());
+    }
+
+    public void setRonda(Ronda ronda) {
+      this.ronda = ronda;
+    }
+
+    //Getter para extraer los equipos para comparar con los de pronosticos
+
+    public String getEquipo1Nombre() {
+      return equipo1.getNombre();
+    }
+    public String getEquipo2Nombre() {
+      return equipo2.getNombre();
+    }
+
+    public String getEquipo1description() {
+      return equipo1.getDescripcion();
+    }
+    public String getEquipo2description() {
+      return equipo2.getDescripcion();
+    }
+
   }
   

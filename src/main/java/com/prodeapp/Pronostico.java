@@ -4,24 +4,25 @@ public class Pronostico {
     private Partido partido;
     private Equipo equipo;
     private ResultadoEnum resultado;
-    
+    private int puntos;
+
     // Constructor
     public Pronostico(Partido partido, Equipo equipo, ResultadoEnum resultado) {
       this.partido = partido;
       this.equipo = equipo;
       this.resultado = resultado;
+      
     }
     
     // Método para calcular los puntos del pronóstico
-    public int puntos() {
+    public int calcularPuntos() {
       int puntos = 0;
       
       if (partido.getResultado() == resultado){
         puntos++;
-    }
-      
-      return puntos;
-    }
+      }
+        return puntos;
+      }
     
     // Getters y Setters
     public Partido getPartido() {
@@ -46,6 +47,9 @@ public class Pronostico {
     
     public void setResultado(ResultadoEnum resultado) {
       this.resultado = resultado;
+    }
+    public int getPuntos(){
+      return puntos;
     }
   }
   
