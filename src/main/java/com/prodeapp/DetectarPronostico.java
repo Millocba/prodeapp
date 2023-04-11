@@ -3,6 +3,8 @@ package com.prodeapp;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DetectarPronostico {
 
@@ -33,7 +35,7 @@ public class DetectarPronostico {
             Equipo equipo1 = new Equipo(values[1],selecciones[Integer.parseInt(values[1])]);
             //System.out.println(equipo1.getNombre()+equipo1.getDescripcion());
             String gana1 = values[2];
-            String empata = values[3];
+            //String empata = values[3];
             String gana2 = values[4];
             Equipo equipo2 = new Equipo(values[5],selecciones[Integer.parseInt(values[5])]);
             //System.out.println(equipo2.getNombre()+equipo2.getDescripcion());
@@ -55,6 +57,14 @@ public class DetectarPronostico {
 
             //llama la clase leer resultado con los datos del archivo
             List<String> lineas1 = FileReaderUtil.readLines("Recursos/resultados2.csv");
+
+            //validacion de los datos del archivo
+            String mensaje= comprobarResultados(lineas1);
+            if (!mensaje.equals("Ok")){
+                System.out.println("Error: "+ mensaje);
+                System.exit(1);
+            }
+
             ArrayList<Partido> partidos = LeerResultados.resultadoPartidos(lineas1);
 
             //encuentra el partido que se ha pronosticado, compara el id del equipo con el id del pronostico
@@ -141,6 +151,95 @@ public class DetectarPronostico {
         return participantes;
     
         
+    }
+
+    private static String comprobarResultados(List<String> lineas1) {
+        String mensaje = "";
+        int i =-1;
+    
+        for(String linea : lineas1){
+            if(i==-1){
+                i++;
+                continue;
+            }else{
+                i++;
+                String[] values = linea.split(";");
+                if (values.length==9){
+
+                    String regex = "(^[1-9]\\d*$)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(values[0]);
+
+                    if (!values[0].isEmpty()|| matcher.matches()){
+                        
+                        matcher = pattern.matcher(values[1]);
+                        
+                        if(values[1].isEmpty() || matcher.matches()){
+                            String regex1 = "^[a-zA-Z]+([. áéíóúÁÉÍÓÚñÑ]?[a-zA-Z]+)*$";
+                            Pattern pattern1 = Pattern.compile(regex1);
+                            matcher = pattern1.matcher(values[2]);
+    
+                            if(values[2].isEmpty() || matcher.matches()){
+                                
+                                matcher = pattern.matcher(values[4]);
+                                
+                                if(values[4].isEmpty() || matcher.matches() || values[4].equals("0")){
+                                    
+                                    matcher = pattern.matcher(values[5]);
+                                    
+                                    if(values[5].isEmpty() || matcher.matches() || values[5].equals("0")){
+                                        
+                                        matcher = pattern.matcher(values[6]);
+                                    
+                                        if(values[6].isEmpty() || matcher.matches()){
+                                            matcher = pattern1.matcher(values[7]);
+                                            
+                                            if(values[7].isEmpty() || matcher.matches()){
+                                                mensaje = "Ok";
+                                                continue;
+                                            }else{
+                                                mensaje = "Falta el nombre del equipo 2 en linea " + i + "-> " + linea ;
+                                                break;
+                                            }
+                                        
+                                        }else{
+                                            mensaje = "Falta el equipo 2 en linea " + i + "-> " + linea ;
+                                            break;
+                                        }
+                                        
+                                    }else{
+                                        mensaje = "Falta goles del equipo 2 en linea " + i + "-> " + linea ;
+                                        break;
+                                    }    
+                                    
+                                }else{
+                                    mensaje = "Falta goles del equipo 1 en linea " + i + "-> " + linea ;
+                                    break;
+                                }
+                                
+                            }else{
+                                mensaje = "Falta el nombre de equipo 1 en linea " + i + "-> " + linea;
+                                break;
+                            }
+    
+                        }else{
+                            mensaje = "Falta el equipo 1 en linea " + i + "-> " + linea;
+                            break;
+                        }
+    
+    
+                    }else{
+                        mensaje = "Falta la ronda en linea " + i + "-> " + linea;
+                        break;
+                    }
+                }else{
+                    mensaje = "Faltan datos en linea " + i + "-> " + linea;
+                    break;
+                }
+            }
+        }
+
+        return mensaje;
     }
 }
 

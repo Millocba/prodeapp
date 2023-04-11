@@ -7,7 +7,7 @@ public class LeerResultados {
     public static ArrayList<Partido> resultadoPartidos(List<String> lineas) {
         int i = 0;
         ArrayList<Partido> partidos = new ArrayList<>();
-        ArrayList<Ronda> rondas = new ArrayList<>();
+        //ArrayList<Ronda> rondas = new ArrayList<>();
 
         for(String line : lineas){
             
