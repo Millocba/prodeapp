@@ -1,0 +1,19 @@
+﻿Participante;Equipo 1 - id;Gana 1;Empata;Gana 2;Equipo 2 - id
+Mariana;1;X;;;2
+Mariana;3;;X;;4
+Mariana;1;X;;;4
+Mariana;3;;;X;1
+Mariana;2;;;X;4
+Pedro;1;X;;;2
+Pedro;3;;;X;4
+Pedro;1;X;;;4
+Pedro;2;;X;;3
+Pedro;3;;X;;1
+Pedro;2;;X;;4
+Juan;1;;;X;2
+Juan;3;;X;;4
+Juan;1;;;X;4
+Mariana;2;;;X;3
+Juan;2;;;X;3
+Juan;3;X;;;1
+Juan;2;;;X;4

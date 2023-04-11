@@ -1,103 +1,125 @@
 package com.prodeapp;
 
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class App {
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-
-        // Leer archivo de pronósticos
-        List<String> lineas = FileReaderUtil.readLines("Recursos/pronostico.csv");
-        Partido[] partidos = new Partido[2];
-        int i = 0;
-        int lineCount = 0;
-        String[] sele1 = new String[2];
-        String[] sele2 = new String[2];
-        int[] golSele1 = new int[2];
-        int[] golSele2 = new int[2];
-
-            ResultadoEnum resultado;
-            
-            int j =0;
-            List<String> lineas1 = FileReaderUtil.readLines("Recursos/resultados.csv");
-            for (String linea1 : lineas1) {
-                   
-                    if (j == 0) {
-                        // saltar la primera línea
-                        j++;
-                        continue;
-                    }
-                    //separo los datos y cargo las variables locales de resultados
-                    String[] values = linea1.split(";");
-                    sele1[j-1] = values[0];
-                    sele2[j-1] = values[5];
-                    golSele1[j-1] = Integer.parseInt(values[3]);
-                    golSele2[j-1] = Integer.parseInt(values[4]);
-                    
-                    j++;
-                    }
-
-            
-            int puntosAcum= 0;
-            //inicio el recorrido de los partidos
-            for (String line : lineas) {
-
-                if (lineCount == 0) {
-                    // saltar la primera línea
-                    lineCount++;
-                    continue;
-                }
-
-                //separar campos y asignar valores a las variables pronostico
-                String[] values = line.split(";");
-                String[] selecciones = {"Argentina","Arabia Saudita", "Polonia", "México"};
-
-                String nombre1 = values[0].trim();
-                String descripcion1 = selecciones[Integer.parseInt(nombre1)-1];
-
-                String nombre2 = values[4].trim();
-                String descripcion2 = selecciones[Integer.parseInt(nombre2)-1];
-
-                //System.out.println(nombre1 + descripcion1+"\n"+ nombre2 + descripcion2);
-                
-                //generar los obejos equipos
-                Equipo equipo1 = new Equipo(nombre1,descripcion1);
-                Equipo equipo2 = new Equipo(nombre2,descripcion2);
-                
-                //armar los partidos
-                partidos[i] = new Partido(equipo1, equipo2, golSele1[i], golSele2[i]);
-                               
-                if (values[1].equals("X")){
-                    resultado = ResultadoEnum.GANADOR;
-                    //resultado2 = ResultadoEnum.PERDEDOR;
-                }else if(values[2].equals("X")){
-                    resultado = ResultadoEnum.EMPATE;
-                    //resultado2 = ResultadoEnum.EMPATE;
-                }else{
-                    resultado = ResultadoEnum.PERDEDOR;
-                    //resultado2 = ResultadoEnum.GANADOR;
-                }
-                Pronostico pronostico1 = new Pronostico(partidos[i], equipo1, resultado);
-                //Pronostico pronostico2 = new Pronostico(partidos[i], equipo2, resultado2);
-
-                //System.out.println(resultado);
-                
-                puntosAcum += pronostico1.puntos();
-
-                System.out.println("Resultado del partido " + i + "-> " + descripcion1 + "-> " + partidos[i].getResultado());
-                System.out.println("pronostico: " + pronostico1.getResultado());
-                System.out.println("Sumas "+ puntosAcum + " puntos");
-                //System.out.println("pronostico: " + pronostico2.getResultado());
-
-                i++;
-
-            }
-
-        System.out.println("Total de puntos acumulados: "+ puntosAcum);
-    
+    public static void main(String[] args) throws IOException, InterruptedException {
         
+        //limpiar pantalla
+        try {
+            clearConsole();
+        } catch (IOException e) {
+            // Manejar excepción
+            System.out.println("Error al limpiar la consola");
+        }
+
+        System.out.println("\u001B[33m****************** \u2B50 PRODEAPP\u2B50 ******************\n");
+
+        //solicita leer el archivo pronostico
+        List<String> lineas = FileReaderUtil.readLines("Recursos/Pronostico2.csv");
+        
+        //metodo para comprobar la validez de los datos
+        String mensaje = comprobarPronostico(lineas);
+        if (!mensaje.equals("Ok")){
+            System.out.println("Error: "+ mensaje);
+            System.exit(1);
+        }
+
+        //solicita obtener los participantes
+        ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas);
+
+        Collections.sort(participantes, new Comparator<Participante>() {
+            @Override
+            public int compare(Participante p1, Participante p2) {
+                return Integer.compare(p2.getPuntajeTotal()+ p2.getBonus(), p1.getPuntajeTotal()+ p1.getBonus());
+            }
+        });
+        
+        // Imprimir los participantes ordenados
+        for (Participante p : participantes) {
+            System.out.println("\u001B[47m\u001B[31mEl participante " + p.getNombre() + " obtuvo " + p.getPuntajeTotal() + " puntos y bonus de " + p.getBonus() + " Total: " + (p.getPuntajeTotal() + p.getBonus()));
+        }
+
+        System.out.println("\u001B[0m\u001B[33m\n******************** Saliendo ********************\u001B[0m");
+
+    }
+
+
+//metodo de validacion de datos del archivo pronostico
+private static String comprobarPronostico(List<String> lineas) {
+    String mensaje ="";
+
+    int i = -1;
+    for(String linea : lineas){
+        if(i==-1){
+            i++;
+            continue;
+        }else{
+            i++;
+            String[] values = linea.split(";");
+            if (values.length==6){
+                if (!values[0].isEmpty()){
+                    
+                    String regex = "(^[0-9]\\d*$)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(values[1]);
+                    
+                    if(values[1].isEmpty() || matcher.matches()){
+                        
+                        matcher = pattern.matcher(values[5]);
+
+                        if(values[5].isEmpty() || matcher.matches()){
+                            if(values[2].equals("X")||values[3].equals("X")||values[4].equals("X")){
+                                mensaje = "Ok";
+                                continue;
+                            }else{
+                                mensaje = "Falta el pronostico en linea " + i + "-> " + linea ;
+                                break;
+                            }
+                            
+                        }else{
+                            mensaje = "Falta el equipo 2 en linea " + i + "-> " + linea;
+                            break;
+                        }
+
+                    }else{
+                        mensaje = "Falta el equipo 1 en linea " + i + "-> " + linea;
+                        break;
+                    }
+
+
+                }else{
+                    mensaje = "Falta el participante en linea " + i + "-> " + linea;
+                    break;
+                }
+            }else{
+                mensaje = "Faltan datos en linea " + i + "-> " + linea;
+                break;
+            }
+        }
+    
+    }
+    return mensaje;
+}
+
+
+// Limpiar la consola
+public static void clearConsole() throws IOException, InterruptedException {
+    // Verificar el sistema operativo
+    if (System.getProperty("os.name").contains("Windows")) {
+        // En Windows
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+    } else {
+        // En Linux/Mac
+        Runtime.getRuntime().exec("clear");
+        new ProcessBuilder("clear").inheritIO().start().waitFor();
     }
 }
 
+}

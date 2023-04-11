@@ -1,15 +1,17 @@
 package com.prodeapp;
 
+import java.util.ArrayList;
+
 public class Ronda {
     private String nro;
-    private Partido[] partidos;
+    private ArrayList<Partido> partidos;
     
     // Constructor
-    public Ronda(String nro, Partido[] partidos) {
+    public Ronda(String nro) {
       this.nro = nro;
-      this.partidos = partidos;
+      this.partidos = new ArrayList<Partido>();
     }
-    
+
     // Método para calcular los puntos de la ronda
     public int puntos() {
       int puntos = 0;
@@ -31,12 +33,14 @@ public class Ronda {
       this.nro = nro;
     }
     
-    public Partido[] getPartidos() {
+    public ArrayList<Partido> getPartidos() {
       return partidos;
     }
     
-    public void setPartidos(Partido[] partidos) {
+    public void setPartidos(ArrayList<Partido> partidos) {
       this.partidos = partidos;
     }
+
+
   }
   
