@@ -65,6 +65,7 @@ public class DetectarPronostico {
                 System.exit(1);
             }
 
+            //Carga los partidos leidos en pronostico
             ArrayList<Partido> partidos = LeerResultados.resultadoPartidos(lineas1);
 
             //encuentra el partido que se ha pronosticado, compara el id del equipo con el id del pronostico
@@ -86,8 +87,8 @@ public class DetectarPronostico {
                             //busca el ultimo participante para agregar los puntos
                             Participante ultimoParticipante = participantes.get(participantes.size() - 1);
                             ultimoParticipante.setBonus(bonus);
-                            System.out.println(bonus + "+ de bonus para " + ultimoParticipante.getNombre()+
-                            " por acertar todos los resultados de la ronda " + ronda);
+                            System.out.println("\u001B[33m"+bonus + "+ de bonus para " + ultimoParticipante.getNombre()+
+                            " por acertar todos los resultados de la ronda " + ronda + " \u001B[31m\u2764");
                         }
                         ronda= partido.getRondaNro();
                         //regresa los contadores a 0
@@ -166,7 +167,7 @@ public class DetectarPronostico {
                 String[] values = linea.split(";");
                 if (values.length==9){
 
-                    String regex = "(^[1-9]\\d*$)";
+                    String regex = "(^[0-9]\\d*$)";
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(values[0]);
 
@@ -183,11 +184,11 @@ public class DetectarPronostico {
                                 
                                 matcher = pattern.matcher(values[4]);
                                 
-                                if(values[4].isEmpty() || matcher.matches() || values[4].equals("0")){
+                                if(values[4].isEmpty() || matcher.matches()){
                                     
                                     matcher = pattern.matcher(values[5]);
                                     
-                                    if(values[5].isEmpty() || matcher.matches() || values[5].equals("0")){
+                                    if(values[5].isEmpty() || matcher.matches()){
                                         
                                         matcher = pattern.matcher(values[6]);
                                     

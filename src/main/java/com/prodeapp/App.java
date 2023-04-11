@@ -19,12 +19,12 @@ public class App {
             System.out.println("Error al limpiar la consola");
         }
 
-        System.out.println("****************** PRODEAPP ******************\n");
+        System.out.println("\u001B[33m****************** \u2B50 PRODEAPP\u2B50 ******************\n");
 
         //solicita leer el archivo pronostico
         List<String> lineas = FileReaderUtil.readLines("Recursos/Pronostico2.csv");
         
-        //crear un metodo aparte
+        //metodo para comprobar la validez de los datos
         String mensaje = comprobarPronostico(lineas);
         if (!mensaje.equals("Ok")){
             System.out.println("Error: "+ mensaje);
@@ -37,19 +37,21 @@ public class App {
         Collections.sort(participantes, new Comparator<Participante>() {
             @Override
             public int compare(Participante p1, Participante p2) {
-                return Integer.compare(p2.getPuntajeTotal(), p1.getPuntajeTotal());
+                return Integer.compare(p2.getPuntajeTotal()+ p2.getBonus(), p1.getPuntajeTotal()+ p1.getBonus());
             }
         });
         
         // Imprimir los participantes ordenados
         for (Participante p : participantes) {
-            System.out.println("El participante " + p.getNombre() + " obtuvo " + p.getPuntajeTotal() + " puntos y bonus de " + p.getBonus());
+            System.out.println("\u001B[47m\u001B[31mEl participante " + p.getNombre() + " obtuvo " + p.getPuntajeTotal() + " puntos y bonus de " + p.getBonus() + " Total: " + (p.getPuntajeTotal() + p.getBonus()));
         }
 
-        System.out.println("\n****************** Saliendo ******************");
+        System.out.println("\u001B[0m\u001B[33m\n******************** Saliendo ********************\u001B[0m");
 
     }
 
+
+//metodo de validacion de datos del archivo pronostico
 private static String comprobarPronostico(List<String> lineas) {
     String mensaje ="";
 
@@ -64,7 +66,7 @@ private static String comprobarPronostico(List<String> lineas) {
             if (values.length==6){
                 if (!values[0].isEmpty()){
                     
-                    String regex = "(^[1-9]\\d*$)";
+                    String regex = "(^[0-9]\\d*$)";
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(values[1]);
                     
@@ -115,7 +117,6 @@ public static void clearConsole() throws IOException, InterruptedException {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
     } else {
         // En Linux/Mac
-        
         Runtime.getRuntime().exec("clear");
         new ProcessBuilder("clear").inheritIO().start().waitFor();
     }
