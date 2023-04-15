@@ -16,7 +16,15 @@ public class DetectarPronostico {
         String nombre = "";
         int ronda = 0;
         int rondaAcertada= 0;
-        
+
+        List<String> lineas1 = Conexion.conectar("SELECT * FROM view_resultado");
+        //validacion de los datos del archivo
+        String mensaje= comprobarResultados(lineas1);
+        if (!mensaje.equals("Ok")){
+            System.out.println("Error: "+ mensaje);
+            System.exit(1);
+        }
+
         //salta primera linea
         for(String line : lineas){
             if (i==0){
@@ -36,14 +44,18 @@ public class DetectarPronostico {
             //System.out.println(equipo1.getNombre()+equipo1.getDescripcion());
             String gana1 = values[2];
             //String empata = values[3];
-            String gana2 = values[4];
-            Equipo equipo2 = new Equipo(values[5],selecciones[Integer.parseInt(values[5])]);
+            //String gana2 = values[4];
+            Equipo equipo2 = new Equipo(values[3],selecciones[Integer.parseInt(values[3])]);
             //System.out.println(equipo2.getNombre()+equipo2.getDescripcion());
             
             
             //encuentra el resultado pronosticado
             ResultadoEnum resultado;
+            resultado = gana1.equals("GANADOR") ? ResultadoEnum.GANADOR :
+            gana1.equals("PERDEDOR") ? ResultadoEnum.PERDEDOR :
+            ResultadoEnum.EMPATE;
 
+            /* 
             if (gana1.equals("X")){
                 resultado = ResultadoEnum.GANADOR;
                 
@@ -53,17 +65,13 @@ public class DetectarPronostico {
                 
             }else{
                 resultado = ResultadoEnum.EMPATE;
-            }
+            } */
 
             //llama la clase leer resultado con los datos del archivo
-            List<String> lineas1 = FileReaderUtil.readLines("Recursos/resultados2.csv");
+            //List<String> lineas1 = FileReaderUtil.readLines("Resultados2.csv");
+            
 
-            //validacion de los datos del archivo
-            String mensaje= comprobarResultados(lineas1);
-            if (!mensaje.equals("Ok")){
-                System.out.println("Error: "+ mensaje);
-                System.exit(1);
-            }
+
 
             //Carga los partidos leidos en pronostico
             ArrayList<Partido> partidos = LeerResultados.resultadoPartidos(lineas1);
