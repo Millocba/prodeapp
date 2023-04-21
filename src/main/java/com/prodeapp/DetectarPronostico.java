@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class DetectarPronostico {
 
-    public static ArrayList<Participante> cargarPredicciones (List<String> lineas) throws IOException{
+    public static ArrayList<Participante> cargarPredicciones (List<String> lineas, int puntosxacierto, int bonusxacierto) throws IOException{
         
         ArrayList<Participante> participantes = new ArrayList<Participante>();
         int i = 0;
@@ -16,7 +16,19 @@ public class DetectarPronostico {
         String nombre = "";
         int ronda = 0;
         int rondaAcertada= 0;
-        
+        Object[] datos = FileReaderUtil.leerConfig("Recursos/config.txt");
+        String nombreBd = String.valueOf(datos[0]);
+        String ipBd = String.valueOf(datos[1]);
+        String port = String.valueOf(datos[2]);
+
+        List<String> lineas1 = Conexion.conectar("SELECT * FROM view_resultado",nombreBd,ipBd,port);
+        //validacion de los datos del archivo
+        String mensaje= comprobarResultados(lineas1);
+        if (!mensaje.equals("Ok")){
+            System.out.println("Error: "+ mensaje);
+            System.exit(1);
+        }
+
         //salta primera linea
         for(String line : lineas){
             if (i==0){
@@ -24,7 +36,7 @@ public class DetectarPronostico {
                 continue;
             }
             
-            int bonus = 0;
+            
             
             String[] selecciones = {"","Argentina","Arabia Saudita", "Polonia", "México"};
             //separa valores de la linea leída
@@ -36,14 +48,18 @@ public class DetectarPronostico {
             //System.out.println(equipo1.getNombre()+equipo1.getDescripcion());
             String gana1 = values[2];
             //String empata = values[3];
-            String gana2 = values[4];
-            Equipo equipo2 = new Equipo(values[5],selecciones[Integer.parseInt(values[5])]);
+            //String gana2 = values[4];
+            Equipo equipo2 = new Equipo(values[3],selecciones[Integer.parseInt(values[3])]);
             //System.out.println(equipo2.getNombre()+equipo2.getDescripcion());
             
             
             //encuentra el resultado pronosticado
             ResultadoEnum resultado;
+            resultado = gana1.equals("GANADOR") ? ResultadoEnum.GANADOR :
+            gana1.equals("PERDEDOR") ? ResultadoEnum.PERDEDOR :
+            ResultadoEnum.EMPATE;
 
+            /* 
             if (gana1.equals("X")){
                 resultado = ResultadoEnum.GANADOR;
                 
@@ -53,17 +69,13 @@ public class DetectarPronostico {
                 
             }else{
                 resultado = ResultadoEnum.EMPATE;
-            }
+            } */
 
             //llama la clase leer resultado con los datos del archivo
-            List<String> lineas1 = FileReaderUtil.readLines("Recursos/resultados2.csv");
+            //List<String> lineas1 = FileReaderUtil.readLines("Resultados2.csv");
+            
 
-            //validacion de los datos del archivo
-            String mensaje= comprobarResultados(lineas1);
-            if (!mensaje.equals("Ok")){
-                System.out.println("Error: "+ mensaje);
-                System.exit(1);
-            }
+
 
             //Carga los partidos leidos en pronostico
             ArrayList<Partido> partidos = LeerResultados.resultadoPartidos(lineas1);
@@ -81,13 +93,13 @@ public class DetectarPronostico {
                     //detectar el cambio de ronda o el final de la lectura
                     if(ronda!=partido.getRondaNro()){
                         
-                        //si las rondas acertadas son iguales al total de rondas otorga bonus de 3 puntos
+                        //si las rondas acertadas son iguales al total de rondas otorga bonusxacierto de 3 puntos
                         if(rondaAcertada==contadorDeRonda&&contadorDeRonda!=0){
-                            bonus = 3;
+                            //bonusxacierto = 1;
                             //busca el ultimo participante para agregar los puntos
                             Participante ultimoParticipante = participantes.get(participantes.size() - 1);
-                            ultimoParticipante.setBonus(bonus);
-                            System.out.println("\u001B[33m"+bonus + "+ de bonus para " + ultimoParticipante.getNombre()+
+                            ultimoParticipante.setBonus(bonusxacierto);
+                            System.out.println("\u001B[33m"+bonusxacierto + "+ de bonus para " + ultimoParticipante.getNombre()+
                             " por acertar todos los resultados de la ronda " + ronda + " \u001B[31m\u2764");
                         }
                         ronda= partido.getRondaNro();
@@ -106,13 +118,13 @@ public class DetectarPronostico {
 
                     //exclusivo para el ultimo elemento
                     if(lineas.size()-1==i){
-                        //si las rondas acertadas son iguales al total de rondas otorga bonus de 3 puntos
+                        //si las rondas acertadas son iguales al total de rondas otorga bonusxacierto de 3 puntos
                         if(rondaAcertada==contadorDeRonda&&contadorDeRonda!=0){
-                            bonus = 3;
+                            //bonusxacierto = 1;
                             //busca el ultimo participante para agregar los puntos
                             Participante ultimoParticipante = participantes.get(participantes.size() - 1);
-                            ultimoParticipante.setBonus(bonus);
-                            System.out.println(bonus + "+ de bonus para " + ultimoParticipante.getNombre()+
+                            ultimoParticipante.setBonus(bonusxacierto);
+                            System.out.println(bonusxacierto + "+ de bonus para " + ultimoParticipante.getNombre()+
                             " por acertar todos los resultados de la ronda " + ronda);
                         }
                     }
@@ -138,13 +150,13 @@ public class DetectarPronostico {
                 Participante participante = new Participante(nombre);
                 //System.out.println(participante.getNombre());
                 participante.addPronostico(pronostico);
-                participante.setPuntajeTotal(pronostico.calcularPuntos());
+                participante.setPuntajeTotal(pronostico.calcularPuntos()*puntosxacierto);
                 participantes.add(participante);
             } else {
                 // si el participante ya existe, agregar la nueva prediccion a su lista de predicciones
                 participanteExistente.addPronostico(pronostico);
                 
-                participanteExistente.setPuntajeTotal(pronostico.calcularPuntos());
+                participanteExistente.setPuntajeTotal(pronostico.calcularPuntos()*puntosxacierto);
             }
         i++;   
         }

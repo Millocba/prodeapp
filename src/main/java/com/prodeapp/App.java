@@ -19,20 +19,30 @@ public class App {
             System.out.println("Error al limpiar la consola");
         }
 
-        System.out.println("\u001B[33m****************** \u2B50 PRODEAPP\u2B50 ******************\n");
+
+        Object[] datos = FileReaderUtil.leerConfig("Recursos/config.txt");
+        String nombreBd = String.valueOf(datos[0]);
+        String ipBd = String.valueOf(datos[1]);
+        String port = String.valueOf(datos[2]);
+        int puntosxacierto = (int) datos[3];
+        int bonusxacierto = (int) datos[4];
+
+
+        System.out.println("\u001B[33m****************** \u2B50 PRODEAPP \u2B50 ******************\n");
 
         //solicita leer el archivo pronostico
-        List<String> lineas = FileReaderUtil.readLines("Recursos/Pronostico2.csv");
+        //List<String> lineas = FileReaderUtil.readLines("Pronostico2.csv");
+        List<String> lineas = Conexion.conectar("SELECT * FROM view_pronostico",nombreBd,ipBd,port);
         
         //metodo para comprobar la validez de los datos
-        String mensaje = comprobarPronostico(lineas);
+         String mensaje = comprobarPronostico(lineas);
         if (!mensaje.equals("Ok")){
             System.out.println("Error: "+ mensaje);
             System.exit(1);
-        }
+        } 
 
         //solicita obtener los participantes
-        ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas);
+        ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas,puntosxacierto,bonusxacierto);
 
         Collections.sort(participantes, new Comparator<Participante>() {
             @Override
@@ -42,10 +52,15 @@ public class App {
         });
         
         // Imprimir los participantes ordenados
+        int n = 0;
         for (Participante p : participantes) {
-            System.out.println("\u001B[47m\u001B[31mEl participante " + p.getNombre() + " obtuvo " + p.getPuntajeTotal() + " puntos y bonus de " + p.getBonus() + " Total: " + (p.getPuntajeTotal() + p.getBonus()));
+            int puntos = p.getPuntajeTotal();
+            int bonus = p.getBonus();
+            System.out.println("\u001B[31mEl participante " + p.getNombre() + " obtuvo " + puntos + " puntos y bonus de " + bonus + " Total: " + (puntos+bonus));
+            String sql= "UPDATE participante SET `puntajeTotal` = "+puntos+", bonus = "+bonus +" WHERE nombre = '" + p.getNombre() +"';";
+            n += Conexion.actualizar(sql,nombreBd,ipBd,port);
         }
-
+        System.out.println(n+" registros cargados. "+"Base de datos actualizada......");
         System.out.println("\u001B[0m\u001B[33m\n******************** Saliendo ********************\u001B[0m");
 
     }
@@ -63,7 +78,7 @@ private static String comprobarPronostico(List<String> lineas) {
         }else{
             i++;
             String[] values = linea.split(";");
-            if (values.length==6){
+            if (values.length==4){
                 if (!values[0].isEmpty()){
                     
                     String regex = "(^[0-9]\\d*$)";
@@ -72,10 +87,10 @@ private static String comprobarPronostico(List<String> lineas) {
                     
                     if(values[1].isEmpty() || matcher.matches()){
                         
-                        matcher = pattern.matcher(values[5]);
+                        matcher = pattern.matcher(values[3]);
 
-                        if(values[5].isEmpty() || matcher.matches()){
-                            if(values[2].equals("X")||values[3].equals("X")||values[4].equals("X")){
+                        if(values[3].isEmpty() || matcher.matches()){
+                            if(values[2].equals("GANADOR")||values[2].equals("EMPATE")||values[2].equals("PERDEDOR")){
                                 mensaje = "Ok";
                                 continue;
                             }else{
@@ -117,7 +132,7 @@ public static void clearConsole() throws IOException, InterruptedException {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
     } else {
         // En Linux/Mac
-        Runtime.getRuntime().exec("clear");
+        
         new ProcessBuilder("clear").inheritIO().start().waitFor();
     }
 }

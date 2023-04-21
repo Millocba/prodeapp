@@ -1,0 +1,5 @@
+database: prodedb
+ipadress: 127.0.0.1
+port: 3306
+puntosxacierto: 2
+puntosxbonus: 3
