@@ -21,6 +21,7 @@ public class FileReaderUtil {
             }
         } catch (IOException e) {
             System.out.println("Error al leer el archivo de resultados");
+            System.exit(1);
         }
 
         return lines;
@@ -58,6 +59,7 @@ public class FileReaderUtil {
             
         } catch (IOException e) {
             System.out.println("Error al leer el archivo de configuración");
+            System.exit(1);
         }
 
         return new Object[]{database, ipadress, port, puntosxacierto, puntosxbonus};

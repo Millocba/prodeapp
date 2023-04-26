@@ -34,21 +34,23 @@ public class Conexion {
             result.add(rowBuilder.toString());
         }
         
-        //String[] arrayResult = result.toArray(new String[0]);
-        for (String a : result){
+        //******para control de los datos extraidos */
+        /* for (String a : result){
           System.out.println(a);
-        }
+        } */
           
       } catch (SQLException e) {
         e.printStackTrace();
+        System.out.println("ERROR: problemas con la base de datos");
+        System.exit(1);
       }
       System.out.println("");
       return result;
     
 
   }
-  public static int actualizar(String consulta) {
-    String url = "jdbc:mysql://127.0.0.1:3306/prodedb";
+  public static int actualizar(String consulta, String nombreBd, String ipBd, String port) {
+    String url = "jdbc:mysql://"+ipBd+":"+port+"/"+nombreBd;
     String user = "root";
     String password = "user";
     int filasActualizadas = 0;
@@ -60,6 +62,8 @@ public class Conexion {
 
       } catch (SQLException e) {
         e.printStackTrace();
+        System.out.println("ERROR: problemas con la base de datos");
+        System.exit(1);
       }
 
       return filasActualizadas;

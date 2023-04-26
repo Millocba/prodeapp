@@ -28,7 +28,7 @@ public class App {
         int bonusxacierto = (int) datos[4];
 
 
-        System.out.println("\u001B[33m****************** \u2B50 PRODEAPP \u2B50 ******************\n");
+        System.out.println("\u001B[33m****************** \u2B50 PRODEAPP \u2B50 ******************");
 
         //solicita leer el archivo pronostico
         //List<String> lineas = FileReaderUtil.readLines("Pronostico2.csv");
@@ -42,7 +42,7 @@ public class App {
         } 
 
         //solicita obtener los participantes
-        ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas,puntosxacierto,bonusxacierto);
+        ArrayList<Participante> participantes = DetectarPronostico.cargarPredicciones(lineas,puntosxacierto,bonusxacierto,nombreBd,ipBd,port);
 
         Collections.sort(participantes, new Comparator<Participante>() {
             @Override
@@ -78,7 +78,7 @@ private static String comprobarPronostico(List<String> lineas) {
         }else{
             i++;
             String[] values = linea.split(";");
-            if (values.length==4){
+            if (values.length==5){
                 if (!values[0].isEmpty()){
                     
                     String regex = "(^[0-9]\\d*$)";

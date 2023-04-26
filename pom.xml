@@ -6,11 +6,11 @@
 
   <groupId>com.prodeapp</groupId>
   <artifactId>prodeapp</artifactId>
-  <version>1</version>
+  <version>3</version>
 
   <name>prodeapp</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <!-- Proyecto Final -->
+  <url>https://github.com/Millocba/prodeapp</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

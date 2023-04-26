@@ -7,7 +7,6 @@ public class LeerResultados {
     public static ArrayList<Partido> resultadoPartidos(List<String> lineas) {
         int i = 0;
         ArrayList<Partido> partidos = new ArrayList<>();
-        //ArrayList<Ronda> rondas = new ArrayList<>();
 
         for(String line : lineas){
             
@@ -21,7 +20,6 @@ public class LeerResultados {
             String[] values = line.split(";");
 
             //crea objeto ronda
-            
             Ronda ronda = new Ronda(values[0]);
             
             //crea los objetos equipos a partir de la lectura
@@ -33,7 +31,8 @@ public class LeerResultados {
             //System.out.println(equipo2.getNombre()+equipo2.getDescripcion());
             
             //crea el partido
-            Partido partido = new Partido(equipo1,equipo2,gol1,gol2,ronda);
+            int idpartido = Integer.parseInt(values[9]);
+            Partido partido = new Partido(idpartido,equipo1,equipo2,gol1,gol2,ronda);
             //System.out.println(partido.getEquipo1Nombre()+partido.getEquipo1description());
             //System.out.println(partido.getEquipo2Nombre()+partido.getEquipo2description());
 

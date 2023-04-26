@@ -1,6 +1,7 @@
 package com.prodeapp;
 
 public class Partido {
+    private int idpartido;
     private Equipo equipo1;
     private Equipo equipo2;
     private int golesEquipo1;
@@ -9,7 +10,8 @@ public class Partido {
     private Ronda ronda;
 
     // Constructor
-    public Partido(Equipo equipo1, Equipo equipo2, int golesEquipo1, int golesEquipo2, Ronda ronda) {
+    public Partido(int idpartido, Equipo equipo1, Equipo equipo2, int golesEquipo1, int golesEquipo2, Ronda ronda) {
+      this.idpartido=idpartido;
       this.equipo1 = equipo1;
       this.equipo2 = equipo2;
       this.golesEquipo1 = golesEquipo1;
@@ -30,6 +32,13 @@ public class Partido {
     }
     
     // Getters y Setters
+    public int getIdpartido() {
+      return idpartido;
+    }
+
+    public void setIdpartido(int idpartido) {
+      this.idpartido = idpartido;
+    }
     public Equipo getEquipo1() {
       return equipo1;
     }

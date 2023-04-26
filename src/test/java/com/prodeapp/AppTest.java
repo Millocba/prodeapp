@@ -14,9 +14,9 @@ public class AppTest
 
     Equipo equipo1 = new Equipo("Equipo 1", "Descripción equipo 1");
     Equipo equipo2 = new Equipo("Equipo 2", "Descripción equipo 2");
-    Partido partidoGanado = new Partido(equipo1, equipo2, 2, 1, new Ronda("1"));
-    Partido partidoPerdido = new Partido(equipo1, equipo2, 1, 2, new Ronda("1"));
-    Partido partidoEmpatado = new Partido(equipo1, equipo2, 1, 1, new Ronda("1"));
+    Partido partidoGanado = new Partido(1,equipo1, equipo2, 2, 1, new Ronda("1"));
+    Partido partidoPerdido = new Partido(2,equipo1, equipo2, 1, 2, new Ronda("1"));
+    Partido partidoEmpatado = new Partido(3,equipo1, equipo2, 1, 1, new Ronda("1"));
     
     @Test
     public void testCalcularResultado() {
@@ -45,7 +45,7 @@ public class AppTest
         Participante participante = new Participante("Juan");
         Equipo equipo1 = new Equipo("Equipo 1", "Descripción del equipo 1");
         Equipo equipo2 = new Equipo("Equipo 2", "Descripción del equipo 2");
-        Partido partido = new Partido(equipo1, equipo2, 2, 1, new Ronda("1"));
+        Partido partido = new Partido(1,equipo1, equipo2, 2, 1, new Ronda("1"));
         Pronostico pronostico = new Pronostico(partido, equipo1, ResultadoEnum.GANADOR);
 
         // Agregamos el pronóstico al participante

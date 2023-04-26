@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class DetectarPronostico {
 
-    public static ArrayList<Participante> cargarPredicciones (List<String> lineas, int puntosxacierto, int bonusxacierto) throws IOException{
+    public static ArrayList<Participante> cargarPredicciones (List<String> lineas, int puntosxacierto, int bonusxacierto, String nombreBd, String ipBd, String port) throws IOException{
         
         ArrayList<Participante> participantes = new ArrayList<Participante>();
         int i = 0;
@@ -16,11 +16,8 @@ public class DetectarPronostico {
         String nombre = "";
         int ronda = 0;
         int rondaAcertada= 0;
-        Object[] datos = FileReaderUtil.leerConfig("Recursos/config.txt");
-        String nombreBd = String.valueOf(datos[0]);
-        String ipBd = String.valueOf(datos[1]);
-        String port = String.valueOf(datos[2]);
 
+        //consulta los pronosticos
         List<String> lineas1 = Conexion.conectar("SELECT * FROM view_resultado",nombreBd,ipBd,port);
         //validacion de los datos del archivo
         String mensaje= comprobarResultados(lineas1);
@@ -29,29 +26,21 @@ public class DetectarPronostico {
             System.exit(1);
         }
 
-        //salta primera linea
+        //Carga los partidos leidos en resultado
+        ArrayList<Partido> partidos = LeerResultados.resultadoPartidos(lineas1);
+
         for(String line : lineas){
+            //salta primera linea
             if (i==0){
                 i++;
                 continue;
             }
             
             
-            
-            String[] selecciones = {"","Argentina","Arabia Saudita", "Polonia", "México"};
             //separa valores de la linea leída
             String[] values = line.split(";");
-
             nombre = values[0];
-            //crea los objetos equipo1 y equipo2
-            Equipo equipo1 = new Equipo(values[1],selecciones[Integer.parseInt(values[1])]);
-            //System.out.println(equipo1.getNombre()+equipo1.getDescripcion());
             String gana1 = values[2];
-            //String empata = values[3];
-            //String gana2 = values[4];
-            Equipo equipo2 = new Equipo(values[3],selecciones[Integer.parseInt(values[3])]);
-            //System.out.println(equipo2.getNombre()+equipo2.getDescripcion());
-            
             
             //encuentra el resultado pronosticado
             ResultadoEnum resultado;
@@ -59,34 +48,14 @@ public class DetectarPronostico {
             gana1.equals("PERDEDOR") ? ResultadoEnum.PERDEDOR :
             ResultadoEnum.EMPATE;
 
-            /* 
-            if (gana1.equals("X")){
-                resultado = ResultadoEnum.GANADOR;
-                
-
-            }else if (gana2.equals("X")){
-                resultado = ResultadoEnum.PERDEDOR;
-                
-            }else{
-                resultado = ResultadoEnum.EMPATE;
-            } */
-
-            //llama la clase leer resultado con los datos del archivo
-            //List<String> lineas1 = FileReaderUtil.readLines("Resultados2.csv");
-            
-
-
-
-            //Carga los partidos leidos en pronostico
-            ArrayList<Partido> partidos = LeerResultados.resultadoPartidos(lineas1);
-
             //encuentra el partido que se ha pronosticado, compara el id del equipo con el id del pronostico
             Partido partidoEncontrado = null;
             for (Partido partido : partidos) {
                 //System.out.println(partido.getEquipo1Nombre()+equipo1.getNombre());
                 //System.out.println(partido.getEquipo2Nombre()+equipo2.getNombre());
                 
-                if (partido.getEquipo1Nombre().equals(equipo1.getNombre()) && partido.getEquipo2Nombre().equals(equipo2.getNombre())) {
+                
+                if (partido.getIdpartido()== Integer.parseInt(values[4])) {
                     partidoEncontrado = partido;
                     //System.out.println("Partido de la ronda " + partido.getRondaNro());
 
@@ -95,7 +64,7 @@ public class DetectarPronostico {
                         
                         //si las rondas acertadas son iguales al total de rondas otorga bonusxacierto de 3 puntos
                         if(rondaAcertada==contadorDeRonda&&contadorDeRonda!=0){
-                            //bonusxacierto = 1;
+                            
                             //busca el ultimo participante para agregar los puntos
                             Participante ultimoParticipante = participantes.get(participantes.size() - 1);
                             ultimoParticipante.setBonus(bonusxacierto);
@@ -120,7 +89,7 @@ public class DetectarPronostico {
                     if(lineas.size()-1==i){
                         //si las rondas acertadas son iguales al total de rondas otorga bonusxacierto de 3 puntos
                         if(rondaAcertada==contadorDeRonda&&contadorDeRonda!=0){
-                            //bonusxacierto = 1;
+                            
                             //busca el ultimo participante para agregar los puntos
                             Participante ultimoParticipante = participantes.get(participantes.size() - 1);
                             ultimoParticipante.setBonus(bonusxacierto);
@@ -133,7 +102,7 @@ public class DetectarPronostico {
             }
             
             //se crea el objeto pronostico con el resumen de los objetos creados
-            Pronostico pronostico = new Pronostico(partidoEncontrado,equipo1,resultado);
+            Pronostico pronostico = new Pronostico(partidoEncontrado,partidoEncontrado.getEquipo1(),resultado);
 
             // buscar si el participante ya existe en el ArrayList
             Participante participanteExistente = null;
@@ -177,7 +146,7 @@ public class DetectarPronostico {
             }else{
                 i++;
                 String[] values = linea.split(";");
-                if (values.length==9){
+                if (values.length==10){
 
                     String regex = "(^[0-9]\\d*$)";
                     Pattern pattern = Pattern.compile(regex);
